@@ -8,18 +8,13 @@ var bodyParser = require('body-parser');
 var swig = require('swig');
 var pg = require('pg');
 
-//*** database *** //
-var connectionString = 'postgres://localhost:5432/puppies';
-
-
-
-// *** routes *** //
-var routes = require('./routes/index.js');
-
 
 // *** express instance *** //
 var app = express();
 
+
+//*** database *** //
+var connectionString = 'postgres://localhost:5432/puppies';
 
 // *** view engine *** //
 var swig = new swig.Swig();
@@ -40,7 +35,38 @@ app.use(express.static(path.join(__dirname, '../client')));
 
 
 // *** main routes *** //
-app.use('/', routes);
+// return ALL puppies
+app.get('/api/puppies', function(req, res, next) {
+
+    var responseArray =[];
+
+    pg.connect(connectionString, function(err, client, done) {
+
+    if(err) {
+      return res.status(500)
+        .json({
+          status: 'error', message: 'You have an error!'
+        });
+      done();
+    } else {
+      //query the database
+      var query = client.query('SELECT * FROM dogs');
+
+      //get all rows
+      query.on('row', function(row){
+        responseArray.push(row);
+      });
+      //Send Data back as json and close the connection
+      query.on('end', function() {
+        res.json(responseArray);
+        done();
+      });
+      //close connection
+      pg.end();
+    }
+  });
+});
+
 
 
 // catch 404 and forward to error handler
