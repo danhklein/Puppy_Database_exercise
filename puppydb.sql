@@ -1,0 +1,15 @@
+DROP DATABASE IF EXISTS puppies;
+
+CREATE DATABASE puppies;
+
+\c puppies;
+
+DROP TABLE IF EXISTS dogs;
+
+CREATE TABLE dogs (
+  name VARCHAR,
+  breed VARCHAR,
+  AGE INTEGER,
+  SEX VARCHAR,
+  ALIVE BOOLEAN
+);
