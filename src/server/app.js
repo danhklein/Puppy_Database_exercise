@@ -133,6 +133,75 @@ app.post('/api/puppies', function(req, res, next) {
   });
 });
 
+// CHANGE a SINGLE puppy
+
+//update a SINGLE puppy
+//sample curl ==> curl --data "column=something&value=something"
+app.put('/api/puppies/:id', function(req, res, next) {
+
+    var newPuppy = req.body;
+
+    //Update table set column ='value'
+
+    pg.connect(connectionString, function(err, client, done) {
+
+    if(err) {
+      return res.status(500)
+        .json({
+          status: 'error', message: 'You have an error!'
+        });
+        console.log(err);
+      done();
+    } else {
+
+      //Insert into the database
+      var query = client.query("UPDATE dogs SET " + newPuppy.column + " ='" + newPuppy.value+ "' WHERE id=" + req.params.id);
+
+
+      //Send Data back as json and close the connection
+      query.on('end', function() {
+        res.json({status: 'success', message: 'CHANGED PUPPY!'});
+        done();
+      });
+      //close connection
+      pg.end();
+    }
+  });
+});
+
+
+// REMOVE a SINGLE puppy
+app.delete('/api/puppies/:id', function(req, res, next) {
+
+    var responseArray =[];
+
+    pg.connect(connectionString, function(err, client, done) {
+
+    if(err) {
+      return res.status(500)
+        .json({
+          status: 'error', message: 'You have an error!'
+        });
+        console.log(err);
+      done();
+    } else {
+      //query the database
+      var query = client.query('DELETE FROM dogs WHERE id=' + req.params.id +'');
+
+      //Send Data back as json and close the connection
+      query.on('end', function() {
+        res.json({status: 'success', message: 'Puppy Was Adopted!'});
+        if (responseArray.length < 1) {
+          res.json({message: "Pound is empty! Go home!"})
+        }
+        done();
+      });
+      //close connection
+      pg.end();
+    }
+  });
+});
+
 
 
 
