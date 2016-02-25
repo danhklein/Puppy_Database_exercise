@@ -67,6 +67,38 @@ app.get('/api/puppies', function(req, res, next) {
   });
 });
 
+// return a SINGLE puppy
+app.get('/api/puppies:id', function(req, res, next) {
+
+    var responseArray =[];
+
+    pg.connect(connectionString, function(err, client, done) {
+
+    if(err) {
+      return res.status(500)
+        .json({
+          status: 'error', message: 'You have an error!'
+        });
+      done();
+    } else {
+      //query the database
+      var query = client.query('SELECT * FROM dogs WHERE id='+req.prams.id);
+
+      //get all rows
+      query.on('row', function(row){
+        responseArray.push(row);
+      });
+      //Send Data back as json and close the connection
+      query.on('end', function() {
+        res.json(responseArray);
+        done();
+      });
+      //close connection
+      pg.end();
+    }
+  });
+});
+
 
 
 // catch 404 and forward to error handler
