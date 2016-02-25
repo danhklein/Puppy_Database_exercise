@@ -68,7 +68,7 @@ app.get('/api/puppies', function(req, res, next) {
 });
 
 // return a SINGLE puppy
-app.get('/api/puppies:id', function(req, res, next) {
+app.get('/api/puppies/:id', function(req, res, next) {
 
     var responseArray =[];
 
@@ -79,10 +79,11 @@ app.get('/api/puppies:id', function(req, res, next) {
         .json({
           status: 'error', message: 'You have an error!'
         });
+        console.log(err);
       done();
     } else {
       //query the database
-      var query = client.query('SELECT * FROM dogs WHERE id='+req.prams.id);
+      var query = client.query('SELECT * FROM dogs WHERE id=' + req.params.id +'');
 
       //get all rows
       query.on('row', function(row){
