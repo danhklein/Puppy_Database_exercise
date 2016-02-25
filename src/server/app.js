@@ -100,6 +100,40 @@ app.get('/api/puppies/:id', function(req, res, next) {
   });
 });
 
+// ADD a SINGLE puppy
+app.post('/api/puppies', function(req, res, next) {
+
+    var newPuppy = req.body;
+
+    var responseArray =[];
+
+    pg.connect(connectionString, function(err, client, done) {
+
+    if(err) {
+      return res.status(500)
+        .json({
+          status: 'error', message: 'You have an error!'
+        });
+        console.log(err);
+      done();
+    } else {
+
+      //Insert into the database
+      var query = client.query("INSERT INTO dogs (name, breed, age, sex, alive) VALUES ('" + newPuppy.name + "' , '" + newPuppy.breed + "' , " + newPuppy.age + " , '" + newPuppy.sex + "' , " + newPuppy.alive + ');' );
+
+
+      //Send Data back as json and close the connection
+      query.on('end', function() {
+        res.json({status: 'success', message: 'Inserted new puppy into the pound!'});
+        done();
+      });
+      //close connection
+      pg.end();
+    }
+  });
+});
+
+
 
 
 // catch 404 and forward to error handler
